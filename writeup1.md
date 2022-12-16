@@ -125,3 +125,27 @@ Les identifiants fonctionnent et nous permettent de récupérer deux fichiers : 
 $ cat README
 Complete this little challenge and use the result as password for user 'laurie' to login in ssh
 ```
+
+et le fichier `fun` qui est compresser.
+
+```shell
+$ tar -xvf fun
+ft_fun/
+ft_fun/C4D03.pcap
+ft_fun/GKGEP.pcap
+...
+ft_fun/G3VJZ.pcap
+ft_fun/Y8S1M.pcap
+
+$ cat ft_fun/C4D03.pcap
+}void useless() {
+
+//file259%
+
+$ cat ft_fun/GKGEP.pcap
+}void useless() {
+
+//file711%
+```
+
+On va creer un [script python](/script/fun.py) qui rassembler tout les fichiers en un seul tout en les remettant dans l'ordre. Une fois cela fait on va lancer le fichiers c, ainsi cree et le hasher via `sha-256`. On a fait un [script bash](/script/fun.sh) qui resume toutes ces etapes.
