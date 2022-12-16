@@ -126,7 +126,7 @@ $ cat README
 Complete this little challenge and use the result as password for user 'laurie' to login in ssh
 ```
 
-et le fichier `fun` qui est compresser.
+Et le fichier `fun` qui est compressé.
 
 ```shell
 $ tar -xvf fun
@@ -148,4 +148,309 @@ $ cat ft_fun/GKGEP.pcap
 //file711%
 ```
 
-On va creer un [script python](/script/fun.py) qui rassembler tout les fichiers en un seul tout en les remettant dans l'ordre. Une fois cela fait on va lancer le fichiers c, ainsi cree et le hasher via `sha-256`. On a fait un [script bash](/script/fun.sh) qui resume toutes ces etapes.
+On créé donc un [script python](/script/fun.py) qui rassemble tout les fichiers en un seul, en prenant soin de les remettre dans l'ordre. Une fois cela fait on compile le fichiers c ainsi créé et on le lance :
+
+```shell
+$ python3 fun.py
+$ gcc main.c
+$ ./a.out
+MY PASSWORD IS: Iheartpwnage
+Now SHA-256 it and submit
+```
+
+Il faut donc hasher `Iheartpwnage` avec `sha-256` ce qui donne `330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4`
+
+Un [script bash](/script/fun.sh) qui résume toutes ces étapes.
+
+Nous pouvons maintenant nous connecter en ssh avec les identifiants `laurie:330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4` !
+
+## Bomb
+
+Après s'être connecté à l'utilisateur laurie, nous trouvons deux fichiers dans notre home : `README` et `bomb`.
+
+```shell
+$ cat README
+Diffuse this bomb!
+When you have all the password use it as "thor" user with ssh.
+
+HINT:
+P
+ 2
+ b
+
+o
+4
+
+NO SPACE IN THE PASSWORD (password is case sensitive).
+```
+
+`bomb` est un exécutable qui comporte 6 niveaux, chacuns demandant un mot de passe pour accéder au suivant.
+
+```shell
+$ ./bomb
+Welcome this is my little bomb !!!! You have 6 stages with
+only one life good luck !! Have a nice day!
+Hello World
+
+BOOM!!!
+The bomb has blown up.
+```
+
+Nous allons donc extraire l'exécutable via `scp` afin de pouvoir l'analyser sur notre machine.
+
+```shell
+$ scp laurie@192.168.56.107:/home/laurie/bomb .
+```
+
+En décompilant l'exécutable avec `Cutter` nous constatons que la bombe comporte effectivement 6 niveaux.
+
+Niveau 1 :
+
+_Voici le code `C` reconstitué :_
+
+```C
+void phase_1(char *pass)
+{
+    if (strcmp(pass, "Public speaking is very easy.")) {
+        explode_bomb();
+    }
+    return;
+}
+```
+
+Le mot de passe est donc `"Public speaking is very easy."`
+
+```shell
+$ ./bomb
+Welcome this is my little bomb !!!! You have 6 stages with
+only one life good luck !! Have a nice day!
+Public speaking is very easy.
+Phase 1 defused. How about the next one?
+
+```
+
+Niveau 2 :
+
+```C
+void read_six_numbers(char *pass, int *tab)
+{
+    nb = sscanf(pass, "%d %d %d %d %d %d", tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+    if (nb < 6) {
+        explode_bomb();
+    }
+    return;
+}
+
+void phase_2(char *pass)
+{
+    int *tab;
+
+    read_six_numbers(pass, tab);
+    if (!tab) {
+        explode_bomb();
+    }
+
+    for (i = i, i++; i <= 5) {
+        if (tab[i] != (i + 1) * tab[i - 1]) {
+            explode_bomb();
+        }
+    }
+}
+```
+
+La fonction `read_six_numbers` nous indique que notre input devra être une suite de six nombres, et grâce à notre indice, nous savons que le second est `2`.
+
+La suite de la fonction `phase_2` nous indique comment doit évoluer notre suite : chaque nombre à partir du second de la suite doit être égal à sa position dans la suite multiplié par le nombre précédent.
+
+Le mot de passe est donc : `1 2 6 24 120 720`.
+
+```shell
+...
+1 2 6 24 120 720
+That's number 2.  Keep going!
+
+```
+
+Niveau 3 :
+
+```C
+void phase_3(char *pass)
+{
+    uint32_t nb1;
+    unsigned char ch1;
+    uint32_t nb2;
+
+    if (sscanf(pass, "%d %c %d", &nb1, &ch1, &nb2) < 3) {
+        explode_bomb();
+    }
+
+    switch(nb1) {
+        case 0:
+            ch_cmp = 113;
+            if (nb2 != 777) {
+                explode_bomb();
+            }
+            break;
+        case 1:
+            ch_cmp = 98;
+            if (nb2 != 214) {
+                explode_bomb();
+            }
+            break;
+        case 2:
+            ch_cmp = 98;
+            if (nb2 != 755) {
+                explode_bomb();
+            }
+            break;
+        case 3:
+            ch_cmp = 107;
+            if (nb2 != 251) {
+                explode_bomb();
+            }
+            break;
+        case 4:
+            ch_cmp = 111;
+            if (nb2 != 160) {
+                explode_bomb();
+            }
+            break;
+        case 5:
+            ch_cmp = 116;
+            if (nb2 != 458) {
+                explode_bomb();
+            }
+            break;
+        case 6:
+            ch_cmp = 118;
+            if (nb2 != 780) {
+                explode_bomb();
+            }
+            break;
+        case 7:
+            ch_cmp = 98;
+            if (nb2 != 524) {
+                explode_bomb();
+            }
+            break;
+        default:
+            explode_bomb();
+    }
+
+    if (ch_cmp == ch1) {
+        return;
+    }
+    explode_bomb();
+}
+```
+
+On peut voir ici que le mot de passe doit être constitué de `3` éléments : 1 `int`, puis 1 `char` et 1 `int`.
+
+Grâce à l'indice, nous savons que le caractère est un `b`, code ascii `98`<sub>`10`</sub>, nous avons donc 3 combinaisons possibles pour `nb1` et `nb2` :
+
+- `1;214`
+- `2;755`
+- `7;524`
+
+La première est la bonne !
+
+Le mot de passe est donc `1 b 214`
+
+_note: les 3 combinaisons fonctionnent, il faudra toutes les essayer pour voir la quelle est dans le mot de pass de Thor_
+
+```
+...
+1 b 214
+Halfway there!
+
+```
+
+Niveau 4 :
+
+```C
+int32_t func4(int arg)
+{
+    int var1;
+    int var2;
+
+    if (arg < 2) {
+        var2 = 1;
+    } else {
+        var1 = func4(arg - 1);
+        var2 = func4(arg - 2);
+        var2 = var2 + var1;
+    }
+    return var2;
+}
+
+void phase_4(char *pass)
+{
+    int arg;
+
+    if (sscanf(pass, "%d", &arg) == 1) {
+        if (func4(arg) != 55) {
+            explode_bomb();
+        }
+        return;
+    }
+    explode_bomb();
+}
+```
+
+On voit que notre input est un nombre unique qui est envoyé dans une fonction récursive `func4`. La sortie de cette fonction est ensuite évaluée, si elle est égale à 55, c'est gagné.
+
+Nous reproduisons donc `func4` pour pouvoir tester son comportement et trouvons que l'input qui renverra `55` est `9`.
+
+Le mot de passe est donc `9`
+
+```
+...
+9
+So you got that one.  Try this one.
+
+```
+
+Niveau 5 :
+
+```C
+void phase_5(char *pass)
+{
+    char hash[7];
+    char key[] = "isrveawhobpnutfg"
+
+    int32_t var_18h;
+    int32_t var_8h;
+    int32_t var_2h;
+
+    if (strlen(pass) != 6) {
+        explode_bomb();
+    }
+    for (i = 0 ; i++ ; i <= 5) {
+        hash[i] = key[str[i] & 0xf];
+    }
+    hash[6] = '\0'
+    if (strcmp(hash, "giants")) {
+        explode_bomb();
+    }
+    return;
+}
+```
+
+Pour cet exercice, le programme prends notre input, vérifie qu'il fait 6 charactères, le passe dans une boucle de cryptage et le compare ensuite à la string `"giants"`.
+
+Nous reproduisons donc cette fonction de cryptage pour obtenir une correspondance avec l'alphabet :
+
+```shell
+$ python phase_5.py
+abcdefghijklmnopqrstuvwxyz
+srveawhobpnutfgisrveawhobp
+```
+
+Avec la correspondance, nous identifions donc 4 mots de passe possibles : `opekma`, `opekmq`, `opukma` et `opukmq`. Comme pour le niveau 3, ils fonctionnent tous, nous devrons donc tous les essayer pour le mot de passe de Thor.
+
+```
+...
+opekma
+Good work!  On to the next...
+
+```
