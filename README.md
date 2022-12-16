@@ -16,11 +16,9 @@ Durant ce projet, vous allez surement rencontrer des difficultés : soyons clair
 
 ## Content
 
-Each level folders contains these files:
-
-- `writeupX.md` : Methode d'exploitation explique
-- `scripts/` : Script permettant d'exploiter l'ISO
-- `bonus/` : Methode alternative d'exploitation
+- `writeupX.md` : Méthodes d'exploitation expliquées
+- `scripts/` : Scripts permettant d'exploiter l'ISO
+- `bonus/` : Méthodes alternatives d'exploitation
 
 ## Plus info
 
