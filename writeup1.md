@@ -250,7 +250,7 @@ void phase_2(char *pass)
         explode_bomb();
     }
 
-    for (i = i, i++; i <= 5) {
+    for (i = 1; i <= 5; i++) {
         if (tab[i] != (i + 1) * tab[i - 1]) {
             explode_bomb();
         }
@@ -418,14 +418,10 @@ void phase_5(char *pass)
     char hash[7];
     char key[] = "isrveawhobpnutfg"
 
-    int32_t var_18h;
-    int32_t var_8h;
-    int32_t var_2h;
-
     if (strlen(pass) != 6) {
         explode_bomb();
     }
-    for (i = 0 ; i++ ; i <= 5) {
+    for (i = 0; i <= 5; i++) {
         hash[i] = key[str[i] & 0xf];
     }
     hash[6] = '\0'
@@ -454,3 +450,109 @@ opekma
 Good work!  On to the next...
 
 ```
+
+Niveau 6 :
+
+```C
+void read_six_numbers(char *pass, int *tab)
+{
+    nb = sscanf(pass, "%d %d %d %d %d %d", tab[0], tab[1], tab[2], tab[3], tab[4], tab[5]);
+    if (nb < 6) {
+        explode_bomb();
+    }
+    return;
+}
+
+void phase_6(char *pass)
+{
+    int *tab;
+
+    int32_t *piVar1;
+    code *pcVar2;
+    int32_t iVar3;
+    code *pcVar4;
+    int32_t iVar5;
+    int32_t var_58h;
+    int32_t var_3ch;
+    int32_t var_38h;
+    int32_t var_34h;
+    int32_t var_30h;
+    code *apcStack48 [5];
+    int32_t tab;
+    int32_t aiStack24 [5];
+
+    read_six_numbers(pass, tab);
+
+    for (i = 0; i <= 5;  i++) {
+        if (tab[i] > 6) {
+            explode_bomb();
+        }
+        for (j = i + 1; j <= 6; j++) {
+            if (tab[i] == tab[j]) {
+                explode_bomb();
+            }
+        }
+    }
+
+    iVar5 = 0;
+    do {
+        pcVar4 = node1;
+        iVar3 = 1;
+        if (1 < aiStack24[iVar5 + -1]) {
+            do {
+                pcVar4 = *(code **)(pcVar4 + 8);
+                iVar3 = iVar3 + 1;
+            } while (iVar3 < aiStack24[iVar5 + -1]);
+        }
+        apcStack48[iVar5 + -1] = pcVar4;
+        iVar5 = iVar5 + 1;
+    } while (iVar5 < 6);
+
+    iVar5 = 1;
+    pcVar4 = (code *)var_30h;
+    do {
+        pcVar2 = apcStack48[iVar5 + -1];
+        *(code **)(pcVar4 + 8) = pcVar2;
+        iVar5 = iVar5 + 1;
+        pcVar4 = pcVar2;
+    } while (iVar5 < 6);
+
+    *(undefined4 *)(pcVar2 + 8) = 0;
+    iVar5 = 0;
+    do {
+        if (*(int32_t *)var_30h < **(int32_t **)(var_30h + 8)) {
+            explode_bomb();
+        }
+        var_30h = *(int32_t *)(var_30h + 8);
+        iVar5 = iVar5 + 1;
+    } while (iVar5 < 5);
+
+    return;
+}
+```
+
+Le programme lit `6` nombres et est composé de plusieurs boucles. La première vérifie que chaque nombre est bien compris entre `1` et `6` et que tous sont différents.
+
+L'indice donné est que le premier chiffre est `4`. Nous avons assez d'information pour bruteforce la bonne combinaison. (Il y a 120 combinaisons possibles).
+
+Nous créons donc un script à exécuter sur la vm qui va lire toutes ces combinaisons stockées dans un fichier et les essayer. Lorsque le programme a trouvé la bonne solution, il s'arrête et la print.
+
+```shell
+$ python phase_6.py
+4 2 6 3 1 5
+```
+
+Et lorsqu'on essaie la solution :
+
+```shell
+...
+4 2 6 3 1 5
+Congratulations! You've defused the bomb!
+$
+```
+
+Selon le `README`, le mot de passe pour `thor` est la combinaison de tous les pass de la bomb sans les espaces.
+
+Après avoir essayé les différentes combinaisons possibles (voir exercices 3 et 5). Aucune solution ne fonctionne. Un petit tour sur `Slack` nous informe qu'une erreur est présente sur l'ISO et qu'il faut inverser les caractères `n-1` et `n-2`.
+
+La bonne combinaison pour l'utilisateur suivant est donc : `thor:Publicspeakingisveryeasy.126241207201b2149opekmq426135`
