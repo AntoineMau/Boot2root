@@ -556,3 +556,19 @@ Selon le `README`, le mot de passe pour `thor` est la combinaison de tous les pa
 Après avoir essayé les différentes combinaisons possibles (voir exercices 3 et 5). Aucune solution ne fonctionne. Un petit tour sur `Slack` nous informe qu'une erreur est présente sur l'ISO et qu'il faut inverser les caractères `n-1` et `n-2`.
 
 La bonne combinaison pour l'utilisateur suivant est donc : `thor:Publicspeakingisveryeasy.126241207201b2149opekmq426135`
+
+## Turtle
+
+Dans le home de `Thor`, encore une fois deux fichier : un `README` nous invitant à résoudre l'énigme pour trouver le mot de passe de `zaz`, et un fichier `turtle` contenant une longue liste d'instructions du style `Tourne droite de 90 degree` ou encore `Avance 100 spaces`.
+
+Après quelques recherche, nous trouvons que le `turtle` est en fait un langage de programmation éducatif et que la suite d'instruction à pour but de faire déplacer une tortue qui va dessiner sur son chemin.
+
+Nous trouvons donc un [interpréteur](http://www.logointerpreter.com/turtle-editor.php) de `turtle` en ligne, mais les instructions qu'il prend ne sont pas exactement les mêmes. Nous écrivons donc un script qui va venir modifier le fichier d'instructions pour le rendre conforme.
+
+Après exécution , les lettre `S` `L` `A` `S` `H` ont été dessinées.
+
+![turtle](/images/turtle.png)
+
+Nous essayons donc `zaz:SLASH`, ce qui ne fonctionne pas. Grâce à [ce site](http://hash-functions.online-domain-tools.com/), nous trouvons qu'il faut passer `SLASH` dans un algorithme de cryptage MD5 pour obtenir le bon mot de passe.
+
+La bonne combinaison pour l'utilisateur suivant est donc : `zaz:646da671ca01bb5d84dbb5fb2238dc8e`
