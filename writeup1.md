@@ -571,7 +571,7 @@ Après exécution , les lettre `S` `L` `A` `S` `H` ont été dessinées.
 
 Nous essayons donc `zaz:SLASH`, ce qui ne fonctionne pas. Grâce à [ce site](http://hash-functions.online-domain-tools.com/), nous trouvons qu'il faut passer `SLASH` dans un algorithme de cryptage MD5 pour obtenir le bon mot de passe.
 
-La bonne combinaison pour l'utilisateur suivant est donc : `zaz:`
+La bonne combinaison pour l'utilisateur suivant est donc : `zaz:646da671ca01bb5d84dbb5fb2238dc8e`
 
 ## Zaz
 
