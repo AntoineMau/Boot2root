@@ -422,7 +422,7 @@ void phase_5(char *pass)
         explode_bomb();
     }
     for (i = 0; i <= 5; i++) {
-        hash[i] = key[str[i] & 0xf];
+        hash[i] = key[pass[i] & 0xf];
     }
     hash[6] = '\0'
     if (strcmp(hash, "giants")) {

@@ -22,7 +22,7 @@ Ce qui nous lancerait un shell `root`.
 
 Pour ce faire, il nous faut placer la `stack` dans la bonne configuration :
 
-![turtle](/images/ret2libc.png)
+![ret2libc](/images/ret2libc.png)
 
 Notre commande sera donc du type :
 
