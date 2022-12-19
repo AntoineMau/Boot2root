@@ -2,7 +2,7 @@
 
 ## On cherche a trouver des `exploit` dans notre machine
 
-On lance [linux-exploit-suggester.sh](https://github.com/mzet-/linux-exploit-suggester/blob/master/linux-exploit-suggester.sh) pour avoir une idee des failles a explorer
+On lance [linux-exploit-suggester.sh](https://github.com/mzet-/linux-exploit-suggester/blob/master/linux-exploit-suggester.sh) pour avoir une idée des failles à explorer
 
 ```shell
 $ cat exploit-suggested.txt
@@ -42,13 +42,13 @@ Possible Exploits:
 ...
 ```
 
-Apres quelque essaie, on trouve que dirtycow 2 fonctionne parfaitement !
+Apres quelque essais, on trouve que dirtycow 2 fonctionne parfaitement !
 
 ## Description
 
-Cette `exploit` utilise comme base le `pokemon exploit of the dirtycow vulnerability` et genere automatiquement un nouveau mot de passe. L'utilisateur sera invite a entrer le nouveau mdp au lancement du binaire. le fichier original `/etc/passwd` sera alors sauvegarder dans `/tmp/passwd.bak` et ecrira pardessus l'utilisateur root. Apres avoir lancer `l'exploit`, on devrait pouvoir de connecter a notre nouvelle utilisateur.
+Cet `exploit` utilise comme base le `pokemon exploit of the dirtycow vulnerability` et génère automatiquement un nouveau mot de passe. L'utilisateur sera invité a entrer le nouveau mdp au lancement du binaire. Le fichier original `/etc/passwd` sera alors sauvegardé dans `/tmp/passwd.bak` et écrira par dessus l'utilisateur root. Après avoir lancé `l'exploit`, on devrait pouvoir se connecter à notre nouvel utilisateur.
 
-L'utilisateur pas defaut creer s'appelle `firefart`
+Le nouvel utilisateur s'appellera `firefart`.
 
 ## Download exploit C file
 
