@@ -1,5 +1,55 @@
 # DirtyCow 2
 
+## On cherche a trouver des `exploit` dans notre machine
+
+On lance [linux-exploit-suggester.sh](https://github.com/mzet-/linux-exploit-suggester/blob/master/linux-exploit-suggester.sh) pour avoir une idee des failles a explorer
+
+```shell
+$ cat exploit-suggested.txt
+
+Available information:
+
+Kernel version: 3.2.0
+Architecture: i386
+Distribution: ubuntu
+Distribution version: 12.04
+Additional checks (CONFIG_*, sysctl entries, custom Bash commands): performed
+Package listing: from current OS
+
+Searching among:
+
+81 kernel space exploits
+49 user space exploits
+
+Possible Exploits:
+
+[+] [CVE-2016-5195] dirtycow
+
+   Details: https://github.com/dirtycow/dirtycow.github.io/wiki/VulnerabilityDetails
+   Exposure: highly probable
+   Tags: debian=7|8,RHEL=5{kernel:2.6.(18|24|33)-*},RHEL=6{kernel:2.6.32-*|3.(0|2|6|8|10).*|2.6.33.9-rt31},RHEL=7{kernel:3.10.0-*|4.2.0-0.21.el7},[ ubuntu=16.04|14.04|12.04 ]
+   Download URL: https://www.exploit-db.com/download/40611
+   Comments: For RHEL/CentOS see exact vulnerable versions here: https://access.redhat.com/sites/default/files/rh-cve-2016-5195_5.sh
+
+[+] [CVE-2016-5195] dirtycow 2
+
+   Details: https://github.com/dirtycow/dirtycow.github.io/wiki/VulnerabilityDetails
+   Exposure: highly probable
+   Tags: debian=7|8,RHEL=5|6|7,[ ubuntu=14.04|12.04 ],ubuntu=10.04{kernel:2.6.32-21-generic},ubuntu=16.04{kernel:4.4.0-21-generic}
+   Download URL: https://www.exploit-db.com/download/40839
+   ext-url: https://www.exploit-db.com/download/40847
+   Comments: For RHEL/CentOS see exact vulnerable versions here: https://access.redhat.com/sites/default/files/rh-cve-2016-5195_5.sh
+...
+```
+
+Apres quelque essaie, on trouve que dirtycow 2 fonctionne parfaitement !
+
+## Description
+
+Cette `exploit` utilise comme base le `pokemon exploit of the dirtycow vulnerability` et genere automatiquement un nouveau mot de passe. L'utilisateur sera invite a entrer le nouveau mdp au lancement du binaire. le fichier original `/etc/passwd` sera alors sauvegarder dans `/tmp/passwd.bak` et ecrira pardessus l'utilisateur root. Apres avoir lancer `l'exploit`, on devrait pouvoir de connecter a notre nouvelle utilisateur.
+
+L'utilisateur pas defaut creer s'appelle `firefart`
+
 ## Download exploit C file
 
 [DirtyCow](https://www.exploit-db.com/download/40839)
